@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>AIS Windows | SAKSHAM Induction Welcome Standee</title>
+  <!-- Google Fonts for premium, modern typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 (free icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* MAIN LAYOUT: Exact physical dimensions 3ft width x 6ft height */
+    body {
+      background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Inter', sans-serif;
+      padding: 30px;
+    }
+
+    /* STANDEE - exact 3:6 ratio - UPDATED WITH VISITOR CARD THEME */
+    .standee {
+      width: 100%;
+      max-width: 550px;
+      aspect-ratio: 1 / 2;
+      background: white;
+      border: 3px solid #d4a017;
+      border-radius: 24px;
+      box-shadow: 0 40px 70px rgba(0, 0, 0, 0.3), 0 15px 30px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Hide scrollbar */
+    .standee::-webkit-scrollbar {
+      display: none;
+    }
+    .standee {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .standee-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Hero top band - Updated to match visitor card gold theme */
+    .hero-band {
+      background: linear-gradient(90deg, #d4a017 0%, #e6c468 50%, #c9a03d 100%);
+      height: 14px;
+      width: 100%;
+    }
+
+    /* Main content */
+    .main-message {
+      padding: 1.8rem 1.5rem 0.8rem 1.5rem;
+      background: transparent;
+    }
+
+    /* AIS Windows Logo + Brand Section - Updated to light cream theme */
+    .ais-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 1.2rem;
+      background: linear-gradient(135deg, #faf6ed 0%, #ffffff 100%);
+      padding: 0.8rem 1rem;
+      border-radius: 24px;
+      border: 1px solid #e6c468;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .logo-container {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e6c468;
+    }
+
+    .ais-logo-img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    .logo-fallback {
+      display: none;
+    }
+
+    .brand-text h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #2c2c2c;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .brand-text .tagline {
+      font-size: 0.7rem;
+      color: #c9a03d;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* SAKSHAM tagline - Updated */
+    .welcome-title {
+      margin: 0.5rem 0 0.4rem;
+    }
+
+    .greeting {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #c9a03d, #d4a017);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .induction-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #faf6ed, #fff4e6);
+      color: #c45c0a;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      margin: 0.7rem 0 0.6rem;
+      border: 1px solid #e6c468;
+    }
+
+    /* Event card - Updated to light cream theme */
+    .event-card {
+      background: linear-gradient(115deg, #faf8f3 0%, #FFFFFF 100%);
+      border-radius: 28px;
+      padding: 1.2rem;
+      margin: 1rem 0;
+      border: 1px solid #e6c468;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .event-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .event-icon {
+      width: 38px;
+      text-align: center;
+      font-size: 1.3rem;
+      color: #c9a03d;
+    }
+    .event-detail {
+      flex: 1;
+      font-weight: 600;
+      color: #1a3c5e;
+      font-size: 0.9rem;
+    }
+    .event-detail strong {
+      font-weight: 800;
+      color: #c9a03d;
+    }
+    .time-badge {
+      background: linear-gradient(135deg, #d4a017, #c9a03d);
+      color: white;
+      border-radius: 60px;
+      padding: 5px 14px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .contact-info {
+      margin-top: 14px;
+      background: #faf8f3;
+      border-radius: 20px;
+      padding: 12px 14px;
+      font-size: 0.75rem;
+      border: 1px solid #e6c468;
+    }
+    .contact-info i {
+      width: 28px;
+      color: #c9a03d;
+    }
+    .contact-row {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .website-link {
+      color: #c9a03d;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .website-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Highlights - Updated */
+    .highlights {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 1rem 0 0.8rem;
+    }
+    .highlight-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #1f2f44;
+      padding: 6px 0;
+    }
+    .highlight-item i {
+      width: 28px;
+      color: #c9a03d;
+      font-size: 1rem;
+    }
+
+    /* Visual panel - Updated with SAKSHAM logo (no circle) */
+    .visual-panel {
+      background: linear-gradient(125deg, #faf8f3 0%, #fffdf8 100%);
+      margin: 0.8rem 1rem 1rem 1rem;
+      border-radius: 36px;
+      padding: 1.2rem 1rem;
+      text-align: center;
+      border: 1px solid #e6c468;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    }
+
+    /* SAKSHAM Logo Container - No circle, just natural display */
+    .saksham-logo-container {
+      width: 180px;
+      margin: 0 auto 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .saksham-logo-img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .saksham-logo-fallback {
+      width: 180px;
+      padding: 20px;
+      background: linear-gradient(135deg, #c9a03d, #d4a017);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: white;
+      text-align: center;
+    }
+
+    .pillar-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 1rem 0 0.6rem;
+      flex-wrap: wrap;
+    }
+    .pillar {
+      background: white;
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #c9a03d;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e6c468;
+    }
+    .hashtag {
+      font-size: 0.7rem;
+      background: linear-gradient(135deg, #ffffff, #fef9f0);
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 40px;
+      margin-top: 12px;
+      font-weight: 600;
+      color: #c9a03d;
+      border: 1px solid #e6c468;
+    }
+
+    .footer-note {
+      background: #f5f2eb;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.65rem;
+      color: #8b691b;
+      border-top: 2px solid #e6c468;
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @media (max-width: 500px) {
+      .greeting {
+        font-size: 1.5rem;
+      }
+      .event-detail {
+        font-size: 0.75rem;
+      }
+      .main-message {
+        padding: 1.2rem;
+      }
+      .ais-brand {
+        padding: 0.6rem;
+      }
+      .ais-logo-img {
+        width: 50px;
+        height: 50px;
+      }
+      .brand-text h2 {
+        font-size: 1.1rem;
+      }
+      .saksham-logo-container {
+        width: 140px;
+      }
+    }
+
+    @keyframes gentleRise {
+      0% { transform: translateY(0px);}
+      100% { transform: translateY(-5px);}
+    }
+    .standee:hover {
+      animation: gentleRise 0.5s ease forwards;
+      box-shadow: 0 50px 80px rgba(0, 0, 0, 0.25);
+    }
+  </style>
+</head>
+<body>
+<div class="standee">
+  <div class="hero-band"></div>
+  <div class="standee-content">
+    <!-- main message block -->
+    <div class="main-message">
+      <!-- AIS Windows Logo -->
+      <div class="ais-brand">
+        <div class="logo-container">
+          <img src="logo.png" alt="AIS Windows Logo" class="ais-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="logo-fallback" style="display: none; width: 64px; height: 64px; background: #c9a03d; border-radius: 12px; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">
+            AIS
+          </div>
+        </div>
+        <div class="brand-text">
+          <h2>AIS Windows</h2>
+          <div class="tagline"><i class="fas fa-window-maximize"></i> Glass Solutions | Innovation Since 1987</div>
+        </div>
+      </div>
+
+      <!-- SAKSHAM induction title -->
+      <div class="welcome-title">
+        <div class="greeting">SAKSHAM Induction 2026</div>
+        <div class="induction-tag">
+          <i class="fas fa-chalkboard-user"></i> Empowering Potential | Welcome to the AIS Family
+        </div>
+      </div>
+
+      <!-- Event details -->
+      <div class="event-card">
+        <div class="event-row">
+          <div class="event-icon"><i class="fas fa-calendar-alt"></i></div>
+          <div class="event-detail"><strong>📅 17 & 18 April 2026</strong> (Friday & Saturday)</div>
+        </div>
+        <div class="event-row">
+          <div class="event-icon"><i class="fas fa-clock"></i></div>
+          <div class="event-detail"><strong>⏰ 09:30 AM onwards</strong> | Registration from 09:00 AM</div>
+          <div class="time-badge"><i class="fas fa-hourglass-half"></i> Sharp Start</div>
+        </div>
+        <div class="event-row">
+          <div class="event-icon"><i class="fas fa-location-dot"></i></div>
+          <div class="event-detail"><strong>📍 AIS Windows Plant, Faridabad</strong> Sector 58, Faridabad - 121004, Haryana</div>
+        </div>
+        <div class="contact-info">
+          <div class="contact-row">
+            <i class="fas fa-envelope"></i>
+            <span><strong>Contact Coordinators:</strong> lokesh.kumar@aisglass.com &nbsp;|&nbsp; mayank.tomar@aisglass.com</span>
+          </div>
+          <div class="contact-row">
+            <i class="fas fa-globe"></i>
+            <span><strong>Website:</strong> <a href="https://www.aiswindows.com" target="_blank" class="website-link">www.aiswindows.com</a></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- highlights -->
+      <div class="highlights">
+        <div class="highlight-item"><i class="fas fa-users-viewfinder"></i> <span>Meet Leadership & Glass Industry Experts</span></div>
+        <div class="highlight-item"><i class="fas fa-chalkboard-user"></i> <span>Technical Workshops on Advanced Glazing Solutions</span></div>
+        <div class="highlight-item"><i class="fas fa-industry"></i> <span>Exclusive Plant Tour: AIS Windows Faridabad Facility</span></div>
+        <div class="highlight-item"><i class="fas fa-gift"></i> <span>SAKSHAM Induction Kit + Participation Certificate</span></div>
+        <div class="highlight-item"><i class="fas fa-handshake"></i> <span>Networking Lunch & High Tea with Industry Leaders</span></div>
+      </div>
+    </div>
+
+    <!-- visual panel with SAKSHAM logo (natural, no circle) -->
+    <div class="visual-panel">
+      <!-- SAKSHAM Logo - No circle cropping, keeping transparent background -->
+      <div class="saksham-logo-container">
+        <img src="saksham.png" alt="SAKSHAM Logo" class="saksham-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="saksham-logo-fallback" style="display: none;">
+          SAKSHAM
+        </div>
+      </div>
+      
+      <div style="font-size: 0.7rem; color:#8b691b; margin: 6px 0;">A warm welcome to the SAKSHAM & AIS Windows Family</div>
+      
+      <div style="display: flex; justify-content: center; gap: 12px; margin: 12px 0;">
+        <span style="width: 35px; height: 2px; background: #c9a03d; border-radius: 2px;"></span>
+        <span style="width: 8px; height: 8px; background: #c9a03d; border-radius: 50%;"></span>
+        <span style="width: 35px; height: 2px; background: #c9a03d; border-radius: 2px;"></span>
+      </div>
+
+      <div class="pillar-icons">
+        <div class="pillar"><i class="fas fa-leaf"></i> Innovation</div>
+        <div class="pillar"><i class="fas fa-handshake"></i> Integrity</div>
+        <div class="pillar"><i class="fas fa-chart-line"></i> Excellence</div>
+        <div class="pillar"><i class="fas fa-window-maximize"></i> Craftsmanship</div>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <i class="fas fa-smile-wink" style="font-size: 1.4rem; color: #c9a03d; opacity: 0.8;"></i>
+        <i class="fas fa-heart" style="font-size: 1.1rem; color: #c9a03d; margin: 0 6px;"></i>
+        <i class="fas fa-glass-cheers" style="font-size: 1.3rem; color: #c9a03d;"></i>
+      </div>
+      <div class="hashtag">
+        <i class="fab fa-hashtag"></i> SAKSHAMInduction2026  #AISWindows #GlassInnovation
+      </div>
+      <div style="font-size: 0.65rem; margin-top: 12px; background: rgba(255,255,240,0.7); padding: 5px 10px; border-radius: 32px; display: inline-block;">
+        <i class="fas fa-map-marker-alt"></i> Plant Visit: Faridabad | Dress Code: Formal/Business
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div class="footer-note">
+      <span><i class="fas fa-bell"></i> Check-in: 09:00 AM - 09:30 AM</span>
+      <span><i class="fas fa-id-card"></i> Carry ID / Registration Confirmation</span>
+      <span><i class="fas fa-globe"></i> www.aiswindows.com/saksham</span>
+    </div>
+  </div>
+  <!-- bottom accent band - Updated to gold theme -->
+  <div style="height: 6px; background: linear-gradient(90deg, #c9a03d, #e6c468, #d4a017);"></div>
+</div>
+
+<script>
+  window.addEventListener('load', function() {
+    const logoImg = document.querySelector('.ais-logo-img');
+    if (logoImg) {
+      console.log('AIS Windows logo loaded from: logo.png');
+    }
+    const sakshamLogo = document.querySelector('.saksham-logo-img');
+    if (sakshamLogo) {
+      console.log('SAKSHAM logo loaded from: saksham.png');
+    }
+  });
+</script>
+</body>
+</html>
