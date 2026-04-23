@@ -4505,81 +4505,163 @@
 
   // ========== KPI CATEGORY & TILES RENDER ==========
   function renderCategorySections() {
-    const container = document.getElementById("kpiCategorySections");
-    const enriched = getEnrichedKpis();
-    const cats = { sales:[], operations:[], quality:[], finance:[] };
-    enriched.forEach(k => { const cat = k.category || "operations"; if (cats[cat]) cats[cat].push(k); });
-    let html = "";
-    for (const [cat,kpis] of Object.entries(cats)) {
-      if (!kpis.length) continue;
-      const catAvg = kpis.reduce((a,k)=>a+k.metrics.yearlyPct,0)/kpis.length;
-      html += `<div class="kpi-category"><div class="category-header"><div class="category-title-wrap"><h2>${cat.toUpperCase()}</h2><p>${kpis.length} KPIs · avg ${pct(catAvg)}</p></div><div class="category-meta"><span class="category-pill ${cat}">${cat}</span></div></div><div class="kpi-tile-grid">`;
-      kpis.forEach((kpi, index) => {
-        const m = kpi.metrics;
-        const isPinned = pinnedKpis.includes(kpi.id);
-        const trend = m.monthlyPct > m.yearlyPct ? "up" : m.monthlyPct < m.yearlyPct ? "down" : "flat";
-        const healthTag = classifyHealthTag(kpi);
-        html += `<div class="kpi-tile ${isPinned ? "pinned":""}" data-id="${kpi.id}" draggable="true"><div class="tile-top"><div class="tile-rank">#${index+1}</div><div class="tile-title-wrap"><div class="tile-title">${esc(kpi.name)}</div></div><div class="tile-actions"><button class="icon-chip pin-tile-btn" data-id="${kpi.id}"><i class="fas fa-thumbtack"></i></button><button class="icon-chip compare-tile-btn" data-id="${kpi.id}"><i class="fas fa-balance-scale"></i></button></div></div><div class="tile-badges"><span class="status-pill ${m.status}">${healthTag.toUpperCase()}</span>${m.status === "green" ? '<span class="mini-badge top">Top</span>' : ""}${m.forecastPct < 85 ? '<span class="mini-badge alert">High Risk</span>' : ""}</div><div class="tile-primary-metric"><span class="tile-metric">${pct(m.yearlyPct)}</span><span class="tile-trend ${trend}"><i class="fas fa-arrow-${trend}"></i> ${trend==="up"?"Improving":trend==="down"?"Declining":"Stable"}</span></div><div class="tile-stats"><div class="tile-stat"><span class="tile-stat-label">Plan</span><span class="tile-stat-value">${fmt(kpi.yearlyPlan)}</span></div><div class="tile-stat"><span class="tile-stat-label">Actual</span><span class="tile-stat-value">${fmt(m.yearlyActual)}</span></div><div class="tile-stat"><span class="tile-stat-label">Forecast</span><span class="tile-stat-value">${fmt(m.forecastYearly)}</span><span class="tile-stat-sub">${pct(m.forecastPct)}</span></div></div><div class="tile-footer"><canvas class="sparkline" id="spark-${kpi.id}" width="112" height="36"></canvas><div class="variance-text">Gap <strong>${fmt(m.gap)}</strong><br><span>${m.forecastPct < 85 ? "HIGH RISK" : m.forecastPct < 95 ? "WATCHLIST" : "ON TRACK"}</span></div></div></div>`;
-      });
-      html += `</div></div>`;
-    }
-    container.innerHTML = html || '<div style="padding:16px;">No KPI data available.</div>';
-
-    enriched.forEach(kpi => {
-      setTimeout(() => {
-        const canvas = document.getElementById(`spark-${kpi.id}`);
-        if (canvas) {
-          const ctx = canvas.getContext("2d");
-          const values = Object.values(kpi.monthlyActuals || {});
-          new Chart(ctx, {
-            type: "line",
-            data: { labels: FY_MONTHS.slice(0, currentMonth + 1), datasets: [{ data: values.slice(0, currentMonth + 1), borderColor: "var(--primary)", borderWidth: 2, pointRadius: 0, tension: 0.3 }] },
-            options: { responsive: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } } }
-          });
-        }
-      }, 10);
+  const container = document.getElementById("kpiCategorySections");
+  const enriched = getEnrichedKpis();
+  
+  // Dynamically build categories from categoriesData
+  const cats = {};
+  categoriesData.forEach(cat => { cats[cat.id] = []; });
+  // Also include 'other' for any KPIs with missing category
+  cats['other'] = [];
+  
+  enriched.forEach(k => { 
+    const cat = k.category || "other"; 
+    if (!cats[cat]) cats[cat] = [];
+    cats[cat].push(k); 
+  });
+  
+  // Remove empty categories
+  Object.keys(cats).forEach(cat => {
+    if (cats[cat].length === 0) delete cats[cat];
+  });
+  
+  let html = "";
+  for (const cat of Object.keys(cats)) {
+    const kpis = cats[cat];
+    if (!kpis.length) continue;
+    
+    // Find category display name and color
+    const catInfo = categoriesData.find(c => c.id === cat) || { name: cat, color: '#888' };
+    const catName = catInfo.name || cat;
+    const catColor = catInfo.color || '#888';
+    
+    const catAvg = kpis.reduce((a,k)=>a+k.metrics.yearlyPct,0)/kpis.length;
+    
+    html += `<div class="kpi-category">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <h2>${esc(catName)}</h2>
+          <p>${kpis.length} KPIs · avg ${pct(catAvg)}</p>
+        </div>
+        <div class="category-meta">
+          <span class="category-pill" style="background:${catColor}20;color:${catColor};border-color:${catColor}80;">${esc(catName)}</span>
+        </div>
+      </div>
+      <div class="kpi-tile-grid">`;
+    
+    kpis.forEach((kpi, index) => {
+      const m = kpi.metrics;
+      const isPinned = pinnedKpis.includes(kpi.id);
+      const trend = m.monthlyPct > m.yearlyPct ? "up" : m.monthlyPct < m.yearlyPct ? "down" : "flat";
+      const healthTag = classifyHealthTag(kpi);
+      html += `<div class="kpi-tile ${isPinned ? "pinned":""}" data-id="${kpi.id}" draggable="true">
+        <div class="tile-top">
+          <div class="tile-rank">#${index+1}</div>
+          <div class="tile-title-wrap">
+            <div class="tile-title">${esc(kpi.name)}</div>
+          </div>
+          <div class="tile-actions">
+            <button class="icon-chip pin-tile-btn" data-id="${kpi.id}"><i class="fas fa-thumbtack"></i></button>
+            <button class="icon-chip compare-tile-btn" data-id="${kpi.id}"><i class="fas fa-balance-scale"></i></button>
+          </div>
+        </div>
+        <div class="tile-badges">
+          <span class="status-pill ${m.status}">${healthTag.toUpperCase()}</span>
+          ${m.status === "green" ? '<span class="mini-badge top">Top</span>' : ""}
+          ${m.forecastPct < 85 ? '<span class="mini-badge alert">High Risk</span>' : ""}
+        </div>
+        <div class="tile-primary-metric">
+          <span class="tile-metric">${pct(m.yearlyPct)}</span>
+          <span class="tile-trend ${trend}">
+            <i class="fas fa-arrow-${trend}"></i> ${trend==="up"?"Improving":trend==="down"?"Declining":"Stable"}
+          </span>
+        </div>
+        <div class="tile-stats">
+          <div class="tile-stat">
+            <span class="tile-stat-label">Plan</span>
+            <span class="tile-stat-value">${fmt(kpi.yearlyPlan)}</span>
+          </div>
+          <div class="tile-stat">
+            <span class="tile-stat-label">Actual</span>
+            <span class="tile-stat-value">${fmt(m.yearlyActual)}</span>
+          </div>
+          <div class="tile-stat">
+            <span class="tile-stat-label">Forecast</span>
+            <span class="tile-stat-value">${fmt(m.forecastYearly)}</span>
+            <span class="tile-stat-sub">${pct(m.forecastPct)}</span>
+          </div>
+        </div>
+        <div class="tile-footer">
+          <canvas class="sparkline" id="spark-${kpi.id}" width="112" height="36"></canvas>
+          <div class="variance-text">
+            Gap <strong>${fmt(m.gap)}</strong><br>
+            <span>${m.forecastPct < 85 ? "HIGH RISK" : m.forecastPct < 95 ? "WATCHLIST" : "ON TRACK"}</span>
+          </div>
+        </div>
+      </div>`;
     });
-
-    document.querySelectorAll(".pin-tile-btn").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); togglePin(b.dataset.id); }));
-    document.querySelectorAll(".compare-tile-btn").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); toggleCompare(b.dataset.id); }));
-    document.querySelectorAll(".kpi-tile").forEach(t => t.addEventListener("click", e => { if (!e.target.closest("button")) openKpiDetailModal(t.dataset.id); }));
-
-    // IMP 6: apply anomaly markers to newly rendered tiles
-    applyAnomalyTileMarkers();
-
-    // PHASE 8: Drag-and-drop within each category grid
-    let dragSrcId = null;
-    document.querySelectorAll('.kpi-tile').forEach(tile => {
-      tile.addEventListener('dragstart', e => {
-        dragSrcId = tile.dataset.id;
-        tile.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-      });
-      tile.addEventListener('dragend', () => {
-        tile.classList.remove('dragging');
-        document.querySelectorAll('.kpi-tile').forEach(t => t.classList.remove('drag-over'));
-      });
-      tile.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        document.querySelectorAll('.kpi-tile').forEach(t => t.classList.remove('drag-over'));
-        tile.classList.add('drag-over');
-      });
-      tile.addEventListener('drop', e => {
-        e.preventDefault();
-        tile.classList.remove('drag-over');
-        if (!dragSrcId || dragSrcId === tile.dataset.id) return;
-        // Swap order in kpiTileOrder for this user
-        const order = getTileOrder();
-        const ai = order.indexOf(dragSrcId);
-        const bi = order.indexOf(tile.dataset.id);
-        if (ai === -1 || bi === -1) return;
-        [order[ai], order[bi]] = [order[bi], order[ai]];
-        saveTileOrder(order);
-        renderCategorySections();
-      });
-    });
+    
+    html += `</div></div>`;
   }
+  
+  container.innerHTML = html || '<div style="padding:16px;">No KPI data available.</div>';
+
+  // Render sparklines
+  enriched.forEach(kpi => {
+    setTimeout(() => {
+      const canvas = document.getElementById(`spark-${kpi.id}`);
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        const values = Object.values(kpi.monthlyActuals || {});
+        new Chart(ctx, {
+          type: "line",
+          data: { labels: FY_MONTHS.slice(0, currentMonth + 1), datasets: [{ data: values.slice(0, currentMonth + 1), borderColor: "var(--primary)", borderWidth: 2, pointRadius: 0, tension: 0.3 }] },
+          options: { responsive: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } } }
+        });
+      }
+    }, 10);
+  });
+
+  // Attach event listeners
+  document.querySelectorAll(".pin-tile-btn").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); togglePin(b.dataset.id); }));
+  document.querySelectorAll(".compare-tile-btn").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); toggleCompare(b.dataset.id); }));
+  document.querySelectorAll(".kpi-tile").forEach(t => t.addEventListener("click", e => { if (!e.target.closest("button")) openKpiDetailModal(t.dataset.id); }));
+
+  // Apply anomaly markers
+  applyAnomalyTileMarkers();
+
+  // Drag-and-drop
+  let dragSrcId = null;
+  document.querySelectorAll('.kpi-tile').forEach(tile => {
+    tile.addEventListener('dragstart', e => {
+      dragSrcId = tile.dataset.id;
+      tile.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    tile.addEventListener('dragend', () => {
+      tile.classList.remove('dragging');
+      document.querySelectorAll('.kpi-tile').forEach(t => t.classList.remove('drag-over'));
+    });
+    tile.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.kpi-tile').forEach(t => t.classList.remove('drag-over'));
+      tile.classList.add('drag-over');
+    });
+    tile.addEventListener('drop', e => {
+      e.preventDefault();
+      tile.classList.remove('drag-over');
+      if (!dragSrcId || dragSrcId === tile.dataset.id) return;
+      const order = getTileOrder();
+      const ai = order.indexOf(dragSrcId);
+      const bi = order.indexOf(tile.dataset.id);
+      if (ai === -1 || bi === -1) return;
+      [order[ai], order[bi]] = [order[bi], order[ai]];
+      saveTileOrder(order);
+      renderCategorySections();
+    });
+  });
+}
 
   function toggleCompare(id) {
     if (compareList.includes(id)) compareList = compareList.filter(i => i !== id);
