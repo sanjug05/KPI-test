@@ -971,15 +971,24 @@
     .kpi-tile.pinned::after {
       content:"📌 PRIORITY";
       position:absolute;
-      top:11px;
-      right:11px;
-      font-size:.64rem;
+      bottom:10px;
+      left:11px;
+      top:auto;
+      right:auto;
+      font-size:.62rem;
       font-weight:800;
       color:#fef3c7;
       background:linear-gradient(135deg,#f59e0b,#b45309);
-      padding:5px 8px;
+      padding:4px 8px;
       border-radius:999px;
-      box-shadow:0 8px 20px rgba(180,83,9,0.8);
+      box-shadow:0 4px 12px rgba(180,83,9,0.6);
+      z-index:1;
+    }
+
+    /* FIX C: ensure tile-actions buttons sit above the pinned badge */
+    .tile-actions {
+      position:relative;
+      z-index:3;
     }
 
     .tile-top {
@@ -2539,6 +2548,108 @@
 
     /* ========== FIX 5: PRIMARY KPIs MONTHLY TREND CHART ========== */
     .primary-kpis-chart canvas { max-height:320px; }
+
+    /* ========== IMP 5: COMPACT VIEW TOGGLE ========== */
+    body.kpi-compact .kpi-tile {
+      padding:10px 11px 8px;
+    }
+    body.kpi-compact .tile-footer { display:none; }
+    body.kpi-compact .tile-stats {
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:5px;
+      margin:7px 0 5px;
+    }
+    body.kpi-compact .tile-stat { padding:5px 7px; }
+    body.kpi-compact .tile-stat-value { font-size:0.78rem; }
+    body.kpi-compact .kpi-tile-grid {
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    }
+    body.kpi-compact .tile-metric { font-size:1.15rem; }
+    body.kpi-compact .tile-trend  { font-size:0.7rem; padding:5px 7px; }
+
+    .compact-toggle-btn {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      background:var(--surface-2);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 13px;
+      font-size:0.72rem;
+      font-weight:600;
+      color:var(--text-muted);
+      cursor:pointer;
+      font-family:inherit;
+      transition:all 0.16s;
+    }
+    .compact-toggle-btn:hover { border-color:var(--primary); color:var(--text); }
+    .compact-toggle-btn.active { border-color:var(--primary); color:var(--primary); background:rgba(96,165,250,0.1); }
+
+    /* ========== IMP 6: ANOMALY TILE INDICATOR ========== */
+    .kpi-tile.anomaly-spike { border-color:rgba(251,191,36,0.7) !important; }
+    .kpi-tile.anomaly-drop  { border-color:rgba(251,113,113,0.7) !important; }
+    .kpi-tile.anomaly-spike::before { background:radial-gradient(circle at 0 0,rgba(251,191,36,0.2),transparent 55%) !important; opacity:1 !important; }
+    .kpi-tile.anomaly-drop::before  { background:radial-gradient(circle at 0 0,rgba(239,68,68,0.18),transparent 55%) !important; opacity:1 !important; }
+
+    .anomaly-tile-badge {
+      position:absolute;
+      top:8px;
+      left:8px;
+      font-size:0.64rem;
+      background:rgba(251,191,36,0.18);
+      border:1px solid rgba(251,191,36,0.6);
+      color:#f59e0b;
+      border-radius:6px;
+      padding:2px 6px;
+      font-weight:700;
+      z-index:2;
+    }
+    .anomaly-tile-badge.drop-badge {
+      background:rgba(239,68,68,0.14);
+      border-color:rgba(251,113,113,0.6);
+      color:var(--danger);
+    }
+
+    /* ========== IMP 7: BULK UPDATE MODAL ========== */
+    .bulk-modal-content {
+      max-width:720px;
+      width:96%;
+    }
+    .bulk-month-select-row {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+    .bulk-month-select-row label { font-size:0.8rem; font-weight:600; color:var(--text-muted); }
+    .bulk-kpi-grid {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      max-height:360px;
+      overflow-y:auto;
+      margin-bottom:16px;
+    }
+    .bulk-kpi-row {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:8px 10px;
+      background:var(--surface-2);
+      border:1px solid var(--line);
+      border-radius:10px;
+      font-size:0.8rem;
+    }
+    .bulk-kpi-row span { flex:1; color:var(--text); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .bulk-kpi-row small { color:var(--text-muted); font-size:0.7rem; flex-shrink:0; }
+    .bulk-kpi-row input[type=number] {
+      width:80px; padding:6px 8px; border-radius:8px;
+      border:1px solid var(--line); background:var(--surface);
+      color:var(--text); font-size:0.8rem; text-align:center;
+      outline:none; font-family:inherit; flex-shrink:0;
+    }
+    .bulk-kpi-row input[type=number]:focus { border-color:var(--primary); }
     .primary-kpis-legend {
       display:flex;
       flex-wrap:wrap;
@@ -3063,7 +3174,7 @@
                   KPI Control Tower
                 </h1>
                 <p class="hero-subtitle">
-                  Real-time portfolio health, forecast risk signals, and root-cause-ready narratives to power performance reviews across, Operations, Quality and Finance.
+                  Real-time portfolio health, forecast risk signals, and root-cause-ready narratives to power CXO performance reviews across Sales, Operations, Quality and Finance.
                 </p>
               </div>
             </div>
@@ -3165,6 +3276,20 @@
           <input type="text" id="kpiSearchInput" placeholder="Search KPI, owner, category...">
         </div>
         <span class="fy-label" id="fyLabel">FY —</span>
+        <!-- IMP 3: Quick period selector -->
+        <div class="filter-group">
+          <label><i class="fas fa-clock"></i> Period</label>
+          <select id="periodSelect">
+            <option value="current">Current Month</option>
+            <option value="last">Last Month</option>
+            <option value="qtd">Quarter to Date</option>
+            <option value="ytd">Year to Date</option>
+          </select>
+        </div>
+        <!-- IMP 5: Compact View toggle -->
+        <button class="compact-toggle-btn" id="compactViewToggle">
+          <i class="fas fa-grip-horizontal"></i> Compact
+        </button>
         <div class="sync-status" id="syncStatus">
           <i class="fas fa-circle" style="color:#22c55e;"></i> Real-time Firestore sync active
         </div>
@@ -3275,6 +3400,10 @@
       <div class="view-page-header">
         <h2><i class="fas fa-chart-bar"></i> Analytics</h2>
         <p>Portfolio trend analysis, category variance, performance mix, owner-wise breakdown and monthly heatmap across all KPIs.</p>
+      </div>
+      <!-- IMP 4: Download all charts toolbar -->
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-outline btn-compact" id="downloadAllChartsBtn"><i class="fas fa-images"></i> Download All Charts</button>
       </div>
 
       <!-- PHASE 9: Historical comparison bar -->
@@ -3389,7 +3518,7 @@
       <!-- FIX 5: Primary KPIs Monthly Trend — 6 key KPIs across 12 months -->
       <article class="chart-card primary-kpis-chart" style="margin-bottom:18px;">
         <div class="chart-head">
-          <h4><i class="fas fa-chart-line"></i> Primary KPIs · Monthly Trend (Full Year)</h4>
+          <h4><i class="fas fa-chart-line"></i> Primary KPIs · Monthly Trend (YTD)</h4>
           <button class="chart-btn" id="downloadPrimaryKpisBtn"><i class="fas fa-download"></i> PNG</button>
         </div>
         <canvas id="primaryKpisChart"></canvas>
@@ -3408,7 +3537,10 @@
           <button class="btn btn-outline btn-compact" id="toggleWhatIfBtn"><i class="fas fa-chevron-down"></i> Expand</button>
         </div>
         <div id="whatIfPanel" class="whatif-panel">
-          <div class="whatif-sliders" id="whatIfSliders"></div>
+          <div style="margin-bottom:10px;">
+            <input type="text" id="whatIfFilter" placeholder="Filter KPIs…" style="width:100%;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);font-family:inherit;font-size:0.8rem;outline:none;">
+          </div>
+          <div class="whatif-sliders" id="whatIfSliders" style="max-height:300px;overflow-y:auto;"></div>
           <div class="whatif-result" id="whatIfResult">
             <span>Adjusted Portfolio Avg: <strong id="wiAdjAvg">—</strong></span>
             <span>Forecast Change: <strong id="wiAdjFcst">—</strong></span>
@@ -3442,10 +3574,12 @@
         <div class="section-title-row">
           <div>
             <h3>Drilldown View Layer</h3>
-            <p>
-              Monthly levers by KPI with inline plan/actuals, forecast and comments to power region/manager/channel reviews.
-            </p>
+            <p>Monthly levers by KPI with inline plan/actuals, forecast and comments to power region/manager/channel reviews.</p>
           </div>
+          <!-- IMP 7: Bulk update trigger -->
+          <button class="btn btn-primary btn-compact" id="openBulkUpdateBtn" style="flex-shrink:0;">
+            <i class="fas fa-layer-group"></i> Bulk Update
+          </button>
         </div>
         <table class="data-table" id="kpiTable">
           <thead>
@@ -3839,6 +3973,26 @@
     <div style="padding:14px 0 0; display:flex; justify-content:flex-end; gap:10px;">
       <button class="btn btn-outline" id="cancelCommentBtn">Cancel</button>
       <button class="btn btn-primary" id="saveCommentBtn">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMP 7: Bulk Monthly Update Modal -->
+<div id="bulkUpdateModal" class="modal-overlay">
+  <div class="modal-content bulk-modal-content">
+    <div class="modal-header">
+      <h3><i class="fas fa-layer-group" style="color:var(--primary);margin-right:6px;"></i> Bulk Monthly Update</h3>
+      <button class="close-modal" id="closeBulkModalBtn">&times;</button>
+    </div>
+    <div class="bulk-month-select-row">
+      <label>Update Month:</label>
+      <select id="bulkMonthSelect" style="background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;color:var(--text);font-family:inherit;font-size:0.82rem;outline:none;"></select>
+      <span style="font-size:0.76rem;color:var(--text-muted);">Enter actuals for all KPIs in one go, then click Save All.</span>
+    </div>
+    <div id="bulkKpiGrid" class="bulk-kpi-grid"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn btn-outline" id="cancelBulkBtn">Cancel</button>
+      <button class="btn btn-primary" id="saveBulkBtn"><i class="fas fa-save"></i> Save All</button>
     </div>
   </div>
 </div>
@@ -4390,6 +4544,9 @@
     document.querySelectorAll(".compare-tile-btn").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); toggleCompare(b.dataset.id); }));
     document.querySelectorAll(".kpi-tile").forEach(t => t.addEventListener("click", e => { if (!e.target.closest("button")) openKpiDetailModal(t.dataset.id); }));
 
+    // IMP 6: apply anomaly markers to newly rendered tiles
+    applyAnomalyTileMarkers();
+
     // PHASE 8: Drag-and-drop within each category grid
     let dragSrcId = null;
     document.querySelectorAll('.kpi-tile').forEach(tile => {
@@ -4628,8 +4785,7 @@
 
     // PHASE 9: comparison table
     renderComparison();
-    // PHASE 10: anomaly detection, funnel, what-if
-    detectAnomalies(enriched);
+    // PHASE 10: funnel, what-if (anomaly already run in renderAll before tiles)
     renderFunnelFlow();
     renderWhatIf();
     // FIX 5: primary KPIs monthly trend
@@ -4665,9 +4821,14 @@
 
     if (!primaryKpis.length) return;
 
+    // FIX B: only show months up to current financial month (no future zeroes)
+    const finMonth = getFinancialMonth();
+    const visibleMonths = FY_MONTHS.slice(0, finMonth + 1);
+
     const datasets = primaryKpis.map((kpi, idx) => {
       const actuals = kpi.monthlyActuals || buildEmptyMonthlyActuals();
-      const data = FY_MONTHS.map((_, i) => parseFloat(actuals[i] || 0));
+      // FIX B: map data only for visible months
+      const data = visibleMonths.map((_, i) => parseFloat(actuals[i] || 0));
       const color = PRIMARY_KPI_COLORS[idx % PRIMARY_KPI_COLORS.length];
       const shortName = kpi.name.length > 20 ? kpi.name.slice(0, 18) + '…' : kpi.name;
       return {
@@ -4689,7 +4850,7 @@
     primaryKpisChart = new Chart(canvas.getContext('2d'), {
       type: 'line',
       data: {
-        labels: FY_MONTHS,
+        labels: visibleMonths,   // FIX B: only elapsed month labels
         datasets
       },
       options: {
@@ -4700,28 +4861,13 @@
           legend: {
             display: true,
             position: 'bottom',
-            labels: {
-              color: 'var(--text-muted)',
-              boxWidth: 12,
-              padding: 14,
-              font: { size: 11 }
-            }
+            labels: { color: 'var(--text-muted)', boxWidth: 12, padding: 14, font: { size: 11 } }
           },
-          tooltip: {
-            callbacks: {
-              label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`
-            }
-          }
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } }
         },
         scales: {
-          x: {
-            ticks: { color: 'var(--text-muted)', font: { size: 11 } },
-            grid: { color: 'var(--line)', display: true }
-          },
-          y: {
-            ticks: { color: 'var(--text-muted)', font: { size: 11 } },
-            grid: { color: 'var(--line)' }
-          }
+          x: { ticks: { color: 'var(--text-muted)', font: { size: 11 } }, grid: { color: 'var(--line)', display: true } },
+          y: { ticks: { color: 'var(--text-muted)', font: { size: 11 } }, grid: { color: 'var(--line)' } }
         }
       }
     });
@@ -5064,6 +5210,9 @@
   }
 
   function renderAll() {
+    const enriched = getEnrichedKpis();
+    // IMP 6: pre-compute anomaly set before tiles render so markers can be applied
+    detectAnomalies(enriched);
     renderCategorySections();
     renderTable();
     renderSummaryBar();
@@ -5246,6 +5395,8 @@
       document.getElementById("readonlyNotice").classList.toggle("visible", !isAdmin);
       document.getElementById("fyLabel").textContent = getFYLabel();
       document.body.classList.add('sidebar-visible');
+      // IMP 5: restore compact view preference
+      applyCompactView();
       // PHASE 2: show skeletons before data arrives
       kpiFirstLoad = true;
       showSkeletons();
@@ -5253,8 +5404,8 @@
       appStartTime = Date.now();
       snapshotEventCount = 0;
       lastSnapshotTime = null;
-      // PHASE 9: reset notification state on new login
-      notifications = [];
+      // PHASE 9: reset notification state on new login — IMP 2: load from localStorage instead
+      loadNotifications();
       window._notifCheckedIds = new Set();
       renderNotifPanel();
       // Show dashboard view by default
@@ -5284,10 +5435,26 @@
   let notifications = [];
 
   function pushNotification(type, title, kpiName) {
-    const notif = { id: Date.now().toString(36), type, title, kpiName, time: new Date(), read: false };
+    const notif = { id: Date.now().toString(36), type, title, kpiName, time: new Date().toISOString(), read: false };
     notifications.unshift(notif);
     if (notifications.length > 50) notifications = notifications.slice(0, 50);
+    // IMP 2: persist to localStorage
+    saveNotifications();
     renderNotifPanel();
+  }
+
+  function saveNotifications() {
+    try { localStorage.setItem('kpiNotifications', JSON.stringify(notifications)); } catch(e) {}
+  }
+
+  function loadNotifications() {
+    try {
+      const raw = JSON.parse(localStorage.getItem('kpiNotifications') || '[]');
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000; // 7 days
+      notifications = raw
+        .filter(n => new Date(n.time).getTime() > cutoff)
+        .map(n => ({ ...n, time: n.time })); // keep ISO string
+    } catch(e) { notifications = []; }
   }
 
   function renderNotifPanel() {
@@ -5300,18 +5467,19 @@
     if (!notifications.length) { list.innerHTML = '<div class="notif-empty">No notifications yet.</div>'; return; }
     const icons = { red:'fa-exclamation-triangle', risk:'fa-fire', comment:'fa-comment-dots' };
     const colors = { red:'var(--danger)', risk:'var(--warning)', comment:'var(--primary)' };
-    list.innerHTML = notifications.map(n =>
-      `<div class="notif-item ${n.read?'':'unread'}" data-nid="${n.id}">
+    list.innerHTML = notifications.map(n => {
+      const timeStr = n.time ? new Date(n.time).toLocaleTimeString() : '';
+      return `<div class="notif-item ${n.read?'':'unread'}" data-nid="${n.id}">
         <div class="notif-item-icon" style="color:${colors[n.type]||'var(--primary)'}"><i class="fas ${icons[n.type]||'fa-bell'}"></i></div>
         <div class="notif-item-body">
           <div class="notif-item-title">${esc(n.title)}</div>
-          <div class="notif-item-time">${esc(n.kpiName||'')} · ${n.time.toLocaleTimeString()}</div>
+          <div class="notif-item-time">${esc(n.kpiName||'')} · ${timeStr}</div>
         </div>
-      </div>`
-    ).join('');
+      </div>`;
+    }).join('');
     list.querySelectorAll('.notif-item').forEach(el => el.addEventListener('click', () => {
       const n = notifications.find(x => x.id === el.dataset.nid);
-      if (n) { n.read = true; renderNotifPanel(); }
+      if (n) { n.read = true; saveNotifications(); renderNotifPanel(); }
     }));
   }
 
@@ -5370,32 +5538,7 @@
   }
 
   // ========== PHASE 10: ANOMALY DETECTION ==========
-  function detectAnomalies(enriched) {
-    const anomalies = [];
-    enriched.forEach(k => {
-      const actuals = Object.values(k.monthlyActuals || {}).slice(0, currentMonth + 1).map(Number).filter(v => v > 0);
-      if (actuals.length < 3) return;
-      const n = actuals.length;
-      const mean = actuals.reduce((a,b)=>a+b,0)/n;
-      const std = Math.sqrt(actuals.reduce((a,v)=>a+Math.pow(v-mean,2),0)/n);
-      const latest = actuals[actuals.length-1];
-      if (std > 0 && Math.abs(latest - mean) > 2 * std) {
-        anomalies.push({ name: k.name, latest, mean: fmt(mean,1), std: fmt(std,1), direction: latest > mean ? 'spike' : 'drop' });
-      }
-    });
-    const card = document.getElementById('anomalyCard');
-    const list = document.getElementById('anomalyList');
-    if (!card || !list) return;
-    if (!anomalies.length) { card.style.display='none'; return; }
-    card.style.display = 'block';
-    list.innerHTML = anomalies.map(a =>
-      `<div class="anomaly-item">
-        <span>${esc(a.name)} — ${a.direction === 'spike' ? '📈 Unusual spike' : '📉 Unusual drop'}</span>
-        <span style="color:var(--text-muted);font-size:0.74rem;">Latest: ${fmt(a.latest)} · Avg: ${a.mean} · σ: ${a.std}</span>
-      </div>`
-    ).join('');
-  }
-
+  
   // ========== PHASE 10: WHAT-IF PLANNER ==========
   let whatIfAdjustments = {};
 
@@ -5404,16 +5547,19 @@
     if (!enriched.length) return;
     const container = document.getElementById('whatIfSliders');
     if (!container) return;
-    // Show sliders for top 5 non-TAT KPIs
-    const eligible = enriched.filter(k => !k.isTat && k.metrics.yearlyPlan > 0).slice(0, 5);
+    // IMP 1: show ALL non-TAT KPIs (no slice limit), apply text filter
+    const filterTerm = (document.getElementById('whatIfFilter')?.value || '').toLowerCase();
+    const eligible = enriched.filter(k => !k.isTat && k.metrics.yearlyPlan > 0 &&
+      (!filterTerm || k.name.toLowerCase().includes(filterTerm))
+    );
     container.innerHTML = eligible.map(k => {
       const adj = whatIfAdjustments[k.id] !== undefined ? whatIfAdjustments[k.id] : 0;
       return `<div class="whatif-row">
-        <label title="${esc(k.name)}">${esc(k.name.length>22?k.name.slice(0,20)+'…':k.name)}</label>
+        <label title="${esc(k.name)}">${esc(k.name.length>24?k.name.slice(0,22)+'…':k.name)}</label>
         <input type="range" min="-20" max="20" step="1" value="${adj}" data-id="${k.id}" class="wi-slider">
         <span class="whatif-val" id="wiv-${k.id}">${adj>=0?'+':''}${adj}%</span>
       </div>`;
-    }).join('');
+    }).join('') || '<div style="color:var(--text-muted);font-size:0.78rem;padding:6px;">No matching KPIs.</div>';
     container.querySelectorAll('.wi-slider').forEach(sl => {
       sl.addEventListener('input', () => {
         const id = sl.dataset.id;
@@ -5519,21 +5665,47 @@
     const color = document.getElementById('configNewCatColor')?.value || '#38bdf8';
     if (!name) { showToast('Category name required', 'error'); return; }
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+    // FIX A: check for duplicate ID before creation
+    if (categoriesData.some(c => c.id === id)) {
+      showToast(`Category "${name}" already exists`, 'error'); return;
+    }
     try {
       await setDoc(doc(db, 'categories', id), { id, name, color });
       document.getElementById('configNewCatName').value = '';
       showToast(`Category "${name}" added`, 'success');
-    } catch(e) { showToast('Add failed', 'error'); }
+    } catch(e) {
+      // FIX A: detailed error + fallback to local state
+      console.error('Category add error:', e);
+      const msg = e?.code === 'permission-denied'
+        ? "Check Firebase rules for 'categories' collection (needs write access)"
+        : `Category add failed: ${e?.message || e}`;
+      showToast(msg, 'error');
+      // FIX A: fallback — add locally so UI still reflects it this session
+      if (!categoriesData.some(c => c.id === id)) {
+        categoriesData.push({ id, name, color });
+        refreshCategoryDropdown();
+        renderCatList();
+        showToast('Added locally (will not persist without Firestore access)', 'info');
+      }
+    }
   }
 
   async function deleteCat(catId) {
     if (!isAdmin) { showToast('Admin role required', 'error'); return; }
     const inUse = kpiData.filter(k => k.category === catId).length;
-    if (inUse > 0) { showToast('Cannot delete — KPIs still use this category', 'error'); return; }
+    if (inUse > 0) { showToast(`Cannot delete — ${inUse} KPI${inUse>1?'s':''} still use this category`, 'error'); return; }
+    const cat = categoriesData.find(c => c.id === catId);
+    if (!confirm(`Delete category "${cat?.name || catId}"? This cannot be undone.`)) return;
     try {
       await deleteDoc(doc(db, 'categories', catId));
       showToast('Category deleted', 'success');
-    } catch(e) { showToast('Delete failed', 'error'); }
+    } catch(e) {
+      console.error('Category delete error:', e);
+      const msg = e?.code === 'permission-denied'
+        ? "Check Firebase rules for 'categories' collection"
+        : `Delete failed: ${e?.message || e}`;
+      showToast(msg, 'error');
+    }
   }
 
   // ========== FIX 2: HISTORICAL DATA ENTRY ==========
@@ -5747,6 +5919,203 @@
     }
   }
 
+  // ========== IMP 3: QUICK PERIOD SELECTOR ==========
+  function handlePeriodChange() {
+    const val = document.getElementById('periodSelect')?.value || 'current';
+    const finMonth = getFinancialMonth();
+    if (val === 'current') {
+      currentMonth = finMonth;
+    } else if (val === 'last') {
+      currentMonth = Math.max(finMonth - 1, 0);
+    } else if (val === 'qtd') {
+      // Quarter to date: snap to end of current quarter within FY
+      // FY quarters: Q1=0-2 (Apr-Jun), Q2=3-5 (Jul-Sep), Q3=6-8 (Oct-Dec), Q4=9-11 (Jan-Mar)
+      const qEnd = Math.min(Math.floor(finMonth / 3) * 3 + 2, finMonth);
+      currentMonth = qEnd;
+    } else if (val === 'ytd') {
+      currentMonth = finMonth;
+    }
+    // Sync month select dropdown
+    const sel = document.getElementById('monthSelect');
+    if (sel) sel.value = currentMonth;
+    populateMonthSelect();
+    renderAll();
+  }
+
+  // ========== IMP 4: DOWNLOAD ALL CHARTS ==========
+  function downloadAllCharts() {
+    const charts = [
+      { id:'barPlanActualChart',        name:'portfolio-trend' },
+      { id:'horizontalAchievementChart',name:'gap-contribution' },
+      { id:'varianceTrendChart',         name:'category-variance' },
+      { id:'mixPerformanceChart',        name:'performance-mix' },
+      { id:'ownerAchievementChart',      name:'owner-achievement' },
+      { id:'categoryGapChart',           name:'category-gap' },
+      { id:'primaryKpisChart',           name:'primary-kpis-ytd' }
+    ];
+    let delay = 0;
+    let found = 0;
+    charts.forEach(c => {
+      const canvas = document.getElementById(c.id);
+      if (!canvas) return;
+      found++;
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.download = c.name + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }, delay);
+      delay += 400; // stagger downloads so browser doesn't block them
+    });
+    if (found) showToast(`Downloading ${found} charts…`, 'info');
+    else showToast('Switch to Analytics view first to load charts', 'error');
+  }
+
+  // ========== IMP 5: COMPACT VIEW TOGGLE ==========
+  let isCompactView = (() => {
+    try { return localStorage.getItem('kpiCompactView') === 'true'; } catch(e) { return false; }
+  })();
+
+  function applyCompactView() {
+    document.body.classList.toggle('kpi-compact', isCompactView);
+    const btn = document.getElementById('compactViewToggle');
+    if (btn) {
+      btn.classList.toggle('active', isCompactView);
+      btn.innerHTML = isCompactView
+        ? '<i class="fas fa-expand-arrows-alt"></i> Expanded'
+        : '<i class="fas fa-grip-horizontal"></i> Compact';
+    }
+  }
+
+  function toggleCompactView() {
+    isCompactView = !isCompactView;
+    try { localStorage.setItem('kpiCompactView', isCompactView); } catch(e) {}
+    applyCompactView();
+  }
+
+  // ========== IMP 6: ANOMALY TILE INDICATORS ==========
+  // Set of KPI IDs that currently have detected anomalies
+  let anomalyKpiIds = new Set();
+
+  function detectAnomalies(enriched) {
+    const anomalies = [];
+    anomalyKpiIds = new Set(); // IMP 6: reset
+    enriched.forEach(k => {
+      const actuals = Object.values(k.monthlyActuals || {}).slice(0, currentMonth + 1).map(Number).filter(v => v > 0);
+      if (actuals.length < 3) return;
+      const n = actuals.length;
+      const mean = actuals.reduce((a,b)=>a+b,0)/n;
+      const std = Math.sqrt(actuals.reduce((a,v)=>a+Math.pow(v-mean,2),0)/n);
+      const latest = actuals[actuals.length-1];
+      if (std > 0 && Math.abs(latest - mean) > 2 * std) {
+        const direction = latest > mean ? 'spike' : 'drop';
+        anomalies.push({ id: k.id, name: k.name, latest, mean: fmt(mean,1), std: fmt(std,1), direction });
+        anomalyKpiIds.add(k.id + ':' + direction); // IMP 6: track for tile rendering
+      }
+    });
+    const card = document.getElementById('anomalyCard');
+    const list = document.getElementById('anomalyList');
+    if (!card || !list) return;
+    if (!anomalies.length) { card.style.display='none'; return; }
+    card.style.display = 'block';
+    list.innerHTML = anomalies.map(a =>
+      `<div class="anomaly-item">
+        <span>${esc(a.name)} — ${a.direction === 'spike' ? '📈 Unusual spike' : '📉 Unusual drop'}</span>
+        <span style="color:var(--text-muted);font-size:0.74rem;">Latest: ${fmt(a.latest)} · Avg: ${a.mean} · σ: ${a.std}</span>
+      </div>`
+    ).join('');
+  }
+
+  // IMP 6: apply anomaly classes to rendered tiles after category sections render
+  function applyAnomalyTileMarkers() {
+    if (!anomalyKpiIds.size) return;
+    document.querySelectorAll('.kpi-tile').forEach(tile => {
+      const id = tile.dataset.id;
+      tile.classList.remove('anomaly-spike', 'anomaly-drop');
+      // remove existing badge
+      tile.querySelector('.anomaly-tile-badge')?.remove();
+      if (anomalyKpiIds.has(id + ':spike')) {
+        tile.classList.add('anomaly-spike');
+        const badge = document.createElement('span');
+        badge.className = 'anomaly-tile-badge';
+        badge.title = 'Unusual spike detected (>2σ from average)';
+        badge.textContent = '⚠ Spike';
+        tile.appendChild(badge);
+      } else if (anomalyKpiIds.has(id + ':drop')) {
+        tile.classList.add('anomaly-drop');
+        const badge = document.createElement('span');
+        badge.className = 'anomaly-tile-badge drop-badge';
+        badge.title = 'Unusual drop detected (>2σ from average)';
+        badge.textContent = '⚠ Drop';
+        tile.appendChild(badge);
+      }
+    });
+  }
+
+  // ========== IMP 7: BULK MONTHLY UPDATE ==========
+  function openBulkUpdateModal() {
+    if (!isAdmin) { showToast('Admin role required', 'error'); return; }
+    // Populate month select
+    const sel = document.getElementById('bulkMonthSelect');
+    const finMonth = getFinancialMonth();
+    if (sel) {
+      sel.innerHTML = FY_MONTHS.map((m, i) =>
+        `<option value="${i}" ${i > finMonth ? 'disabled' : ''} ${i === currentMonth ? 'selected' : ''}>${m}</option>`
+      ).join('');
+    }
+    renderBulkGrid();
+    document.getElementById('bulkUpdateModal').classList.add('active');
+  }
+
+  function renderBulkGrid() {
+    const monthIdx = parseInt(document.getElementById('bulkMonthSelect')?.value ?? currentMonth);
+    const grid = document.getElementById('bulkKpiGrid');
+    if (!grid) return;
+    const enriched = getEnrichedKpis();
+    grid.innerHTML = enriched.map(k => {
+      const actuals = k.monthlyActuals || buildEmptyMonthlyActuals();
+      const current = parseFloat(actuals[monthIdx] || 0);
+      const plan = parseFloat(fmt(k.yearlyPlan / 12));
+      return `<div class="bulk-kpi-row">
+        <span title="${esc(k.name)}">${esc(k.name.length>30?k.name.slice(0,28)+'…':k.name)}</span>
+        <small>Plan: ${fmt(plan)}</small>
+        <input type="number" min="0" value="${current}" data-id="${k.id}" data-month="${monthIdx}" class="bulk-input" placeholder="0">
+      </div>`;
+    }).join('') || '<div style="color:var(--text-muted);padding:8px;">No KPIs loaded.</div>';
+  }
+
+  async function saveBulkUpdate() {
+    if (!isAdmin) { showToast('Admin role required', 'error'); return; }
+    const inputs = document.querySelectorAll('.bulk-input');
+    if (!inputs.length) return;
+    const monthIdx = parseInt(document.getElementById('bulkMonthSelect')?.value ?? currentMonth);
+    if (monthIdx < getFinancialMonth() && !confirm('Updating a past month. Continue?')) return;
+    const updates = [];
+    inputs.forEach(inp => {
+      const kpiId = inp.dataset.id;
+      const val = parseFloat(inp.value) || 0;
+      const kpi = kpiData.find(k => k.id === kpiId);
+      if (!kpi) return;
+      const newActuals = { ...(kpi.monthlyActuals || buildEmptyMonthlyActuals()), [monthIdx]: val };
+      updates.push(
+        updateDoc(doc(db, 'kpis', kpiId), { monthlyActuals: newActuals, lastUpdated: serverTimestamp(), updatedBy: currentUserEmail })
+          .then(() => logAudit(kpiId, kpi.name, `bulk_monthly_${FY_MONTHS[monthIdx]}`, kpi.monthlyActuals?.[monthIdx]||0, val))
+      );
+    });
+    const btn = document.getElementById('saveBulkBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…'; }
+    try {
+      await Promise.all(updates);
+      showToast(`Bulk update saved for ${FY_MONTHS[monthIdx]} (${updates.length} KPIs)`, 'success');
+      document.getElementById('bulkUpdateModal').classList.remove('active');
+    } catch(e) {
+      console.error('Bulk update error:', e);
+      showToast('Bulk save failed: ' + (e?.message || e), 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save All'; }
+    }
+  }
+
   // ========== EVENT LISTENERS ==========
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("doLoginBtn").addEventListener("click", handleLogin);
@@ -5797,6 +6166,7 @@
     });
     document.getElementById('markAllReadBtn').addEventListener('click', () => {
       notifications.forEach(n => n.read = true);
+      saveNotifications();
       renderNotifPanel();
     });
     document.addEventListener('click', e => {
@@ -5821,6 +6191,8 @@
         : '<i class="fas fa-chevron-down"></i> Expand';
       if (panel.classList.contains('open')) renderWhatIf();
     });
+    // IMP 1: What-If filter
+    document.getElementById('whatIfFilter')?.addEventListener('input', renderWhatIf);
 
     // PHASE 7: KPI Config form wiring
     document.getElementById('configSaveKpiBtn').addEventListener('click', saveConfigKpi);
@@ -5876,6 +6248,23 @@
     document.getElementById('downloadCatGapChartBtn').addEventListener('click', () => downloadChartAsPng('categoryGapChart','category-gap'));
     // FIX 5: primary KPIs chart download
     document.getElementById('downloadPrimaryKpisBtn').addEventListener('click', () => downloadChartAsPng('primaryKpisChart','primary-kpis-monthly-trend'));
+
+    // IMP 3: Quick period selector
+    document.getElementById('periodSelect')?.addEventListener('change', handlePeriodChange);
+
+    // IMP 4: Download all charts
+    document.getElementById('downloadAllChartsBtn')?.addEventListener('click', downloadAllCharts);
+
+    // IMP 5: Compact view toggle
+    applyCompactView(); // apply saved state on load
+    document.getElementById('compactViewToggle')?.addEventListener('click', toggleCompactView);
+
+    // IMP 7: Bulk update modal
+    document.getElementById('openBulkUpdateBtn')?.addEventListener('click', openBulkUpdateModal);
+    document.getElementById('closeBulkModalBtn')?.addEventListener('click', () => document.getElementById('bulkUpdateModal').classList.remove('active'));
+    document.getElementById('cancelBulkBtn')?.addEventListener('click', () => document.getElementById('bulkUpdateModal').classList.remove('active'));
+    document.getElementById('saveBulkBtn')?.addEventListener('click', saveBulkUpdate);
+    document.getElementById('bulkMonthSelect')?.addEventListener('change', renderBulkGrid);
   });
 </script>
 </body>
